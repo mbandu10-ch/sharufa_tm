@@ -1,0 +1,722 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  binaryTargets   = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id                 String               @id
+  firstName          String?
+  lastName           String?
+  email              String?              @unique
+  image              String?
+  role               Role                 @default(CLIENT)
+  vendorStatus       VendorStatus         @default(NONE)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  cargoId            String?
+  mustChangePassword Boolean              @default(false)
+  addresses          Address[]
+  notifications      Notification[]
+  orders             Order[]
+  statusHistory      OrderStatusHistory[]
+  trackingActions    OrderTrackingEvent[]
+  payments           Payment[]
+  cargo              Cargo?               @relation(fields: [cargoId], references: [id])
+  shop               Shop?
+  sourcingRequests   SourcingRequest[]
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  profileId  String
+  type       String   @default("SHIPPING")
+  fullName   String
+  street     String
+  city       String
+  state      String?
+  postalCode String
+  country    String
+  isDefault  Boolean  @default(false)
+  phone      String?
+  details    String?
+  createdAt  DateTime @default(now())
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Shop {
+  id                    String                 @id @default(cuid())
+  name                  String                 @unique
+  slug                  String                 @unique
+  description           String?
+  logo                  String?
+  banner                String?
+  country               String?
+  status                ShopStatus             @default(PENDING)
+  type                  ShopType               @default(GENERAL_STORE)
+  isVisible             Boolean                @default(false)
+  ownerId               String                 @unique
+  allowedCategoryIds    String[]               @default([])
+  verificationStatus    ShopVerificationStatus @default(INCOMPLETE)
+  isVerified            Boolean                @default(false)
+  verifiedAt            DateTime?
+  verifiedBy            String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  commissions           Commission[]
+  financialEvents       FinancialEvent[]
+  financialTransactions FinancialTransaction[]
+  orders                Order[]
+  products              Product[]
+  owner                 Profile                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  complianceEvents      ShopComplianceEvent[]
+  documents             ShopDocument[]
+  legalProfile          ShopLegalProfile?
+}
+
+model ShopLegalProfile {
+  id                     String    @id @default(cuid())
+  shopId                 String    @unique
+  legalBusinessName      String?
+  tradeLicenseNumber     String?
+  tradeLicenseCountry    String?
+  tradeLicenseIssueDate  DateTime?
+  tradeLicenseExpiryDate DateTime?
+  vatNumber              String?
+  vatStatus              String?
+  bankAccountName        String?
+  bankName               String?
+  iban                   String?
+  swiftCode              String?
+  notes                  String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  shop                   Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model ShopDocument {
+  id                 String             @id @default(cuid())
+  shopId             String
+  type               ShopDocumentType
+  fileUrl            String
+  fileName           String
+  verificationStatus ShopDocumentStatus @default(PENDING)
+  rejectionReason    String?
+  expiresAt          DateTime?
+  uploadedAt         DateTime           @default(now())
+  verifiedAt         DateTime?
+  verifiedBy         String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  shop               Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model ShopComplianceEvent {
+  id        String   @id @default(cuid())
+  shopId    String
+  eventType String
+  message   String
+  createdBy String?
+  createdAt DateTime @default(now())
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id                 String                      @id @default(cuid())
+  name               String
+  slug               String                      @unique
+  parentId           String?
+  parent             Category?                   @relation("SubCategories", fields: [parentId], references: [id])
+  subCategories      Category[]                  @relation("SubCategories")
+  attributeTemplates CategoryAttributeTemplate[]
+  products           Product[]
+  sourcingRequests   SourcingRequest[]
+  translations       CategoryTranslation[]
+}
+
+model CategoryTranslation {
+  id         String   @id @default(cuid())
+  categoryId String
+  locale     String   // 'fr', 'en', 'tr'
+  name       String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
+}
+
+model Country {
+  id                   String    @id @default(cuid())
+  name                 String    @unique
+  code                 String    @unique
+  flag                 String?
+  active               Boolean   @default(true)
+  qualityCheckRequired Boolean   @default(false)
+  products             Product[]
+}
+
+model Product {
+  id               String         @id @default(cuid())
+  name             String
+  slug             String         @unique
+  description      String
+  price            Float
+  stock            Int            @default(0)
+  images           String[]
+  isSharufa        Boolean        @default(false)
+  reference        String?        @unique
+  sizes            String[]
+  colors           String[]
+  status           ProductStatus  @default(DRAFT)
+  rejectionReason  String?
+  adminNotes       String?
+  categoryId       String
+  shopId           String?
+  originCountryId  String?
+  minOrderQuantity Int            @default(1)
+  attributes       Json?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  dimensionUnit    String?        @default("CM")
+  height           Float?
+  length           Float?
+  weight           Float?
+  weightUnit       String?        @default("KG")
+  width            Float?
+  orderItems       OrderItem[]
+  category         Category       @relation(fields: [categoryId], references: [id])
+  originCountry    Country?       @relation(fields: [originCountryId], references: [id])
+  shop             Shop?          @relation(fields: [shopId], references: [id])
+  events           ProductEvent[]
+  translations     ProductTranslation[]
+}
+
+model ProductTranslation {
+  id          String   @id @default(cuid())
+  productId   String
+  locale      String   // 'fr', 'en', 'tr'
+  name        String
+  description String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, locale])
+}
+
+model ProductEvent {
+  id        String   @id @default(cuid())
+  productId String
+  adminId   String?
+  eventType String
+  message   String
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model CategoryAttributeTemplate {
+  id         String   @id @default(cuid())
+  categoryId String
+  fieldKey   String
+  label      String
+  fieldType  String
+  required   Boolean  @default(false)
+  options    Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, fieldKey])
+}
+
+model Order {
+  id                     String                @id @default(cuid())
+  orderNumber            String                @unique
+  clientId               String
+  shopId                 String?
+  status                 OrderStatus           @default(NEW)
+  sourceType             OrderSourceType       @default(MARKETPLACE)
+  totalAmount            Float
+  currency               String                @default("XOF")
+  paymentStatus          PaymentStatus         @default(PENDING)
+  shippingAddress        String?
+  adminNotes             String?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  cargoId                String?
+  destinationCountry     String?
+  originCountry          String?
+  freightEstimatedAmount Float?
+  freightPaymentMode     FreightPaymentMode?
+  transportMode          TransportType?
+  shipmentBatchId        String?
+  logisticsStatus        LogisticsStatus       @default(NEW_ORDER)
+  financialTransaction   FinancialTransaction?
+  cargo                  Cargo?                @relation(fields: [cargoId], references: [id])
+  client                 Profile               @relation(fields: [clientId], references: [id])
+  shipmentBatch          ShipmentBatch?        @relation(fields: [shipmentBatchId], references: [id])
+  shop                   Shop?                 @relation(fields: [shopId], references: [id])
+  events                 OrderEvent[]
+  items                  OrderItem[]
+  qualityCheck           OrderQualityCheck?
+  statusHistory          OrderStatusHistory[]
+  trackingEvents         OrderTrackingEvent[]
+  payments               Payment[]
+}
+
+model Cargo {
+  id                 String              @id @default(cuid())
+  name               String
+  originCountry      String
+  destinationCountry String
+  warehouseAddress   String
+  isActive           Boolean             @default(true)
+  cargoType          CargoType           @default(PARTNER)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  city               String?
+  contact            String?
+  transportType      TransportType       @default(AIR)
+  orders             Order[]
+  qualityChecks      OrderQualityCheck[]
+  profiles           Profile[]
+  batches            ShipmentBatch[]
+
+  @@unique([originCountry, destinationCountry, transportType, isActive])
+}
+
+model OrderQualityCheck {
+  id        String                   @id @default(cuid())
+  orderId   String                   @unique
+  cargoId   String
+  status    QualityCheckStatus       @default(PENDING)
+  notes     String?
+  createdAt DateTime                 @default(now())
+  updatedAt DateTime                 @updatedAt
+  cargo     Cargo                    @relation(fields: [cargoId], references: [id])
+  order     Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  media     OrderQualityCheckMedia[]
+}
+
+model OrderQualityCheckMedia {
+  id             String            @id @default(cuid())
+  qualityCheckId String
+  fileUrl        String
+  type           String
+  createdAt      DateTime          @default(now())
+  qualityCheck   OrderQualityCheck @relation(fields: [qualityCheckId], references: [id], onDelete: Cascade)
+}
+
+model OrderTrackingEvent {
+  id              String         @id @default(cuid())
+  orderId         String
+  status          TrackingStatus
+  location        String?
+  note            String?
+  createdByUserId String
+  createdAt       DateTime       @default(now())
+  createdBy       Profile        @relation(fields: [createdByUserId], references: [id])
+  order           Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model OrderEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  adminId   String?
+  eventType String
+  message   String
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model OrderItem {
+  id            String  @id @default(cuid())
+  orderId       String
+  productId     String
+  quantity      Int
+  price         Float
+  selectedSize  String?
+  selectedColor String?
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product       Product @relation(fields: [productId], references: [id])
+}
+
+model OrderStatusHistory {
+  id            String          @id @default(cuid())
+  orderId       String
+  previous      LogisticsStatus
+  new           LogisticsStatus
+  changedById   String
+  changedByRole Role
+  note          String?
+  createdAt     DateTime        @default(now())
+  batchId       String?
+  mediaUrls     String[]        @default([])
+  batch         ShipmentBatch?  @relation(fields: [batchId], references: [id])
+  changedBy     Profile         @relation(fields: [changedById], references: [id])
+  order         Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model SourcingRequest {
+  id                String          @id @default(cuid())
+  clientId          String
+  type              SourcingType    @default(BUY_FOR_ME)
+  title             String?
+  description       String
+  referenceLink     String?
+  imageUrl          String?
+  requestedQuantity Int             @default(1)
+  targetCountry     String?
+  budget            Float?
+  status            SourcingStatus  @default(NEW)
+  adminNotes        String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  categoryId        String?
+  attachments       Attachment[]
+  quotes            Quote[]
+  events            SourcingEvent[]
+  category          Category?       @relation(fields: [categoryId], references: [id])
+  client            Profile         @relation(fields: [clientId], references: [id])
+}
+
+model Quote {
+  id                String          @id @default(cuid())
+  sourcingRequestId String
+  productCost       Float
+  shippingCost      Float           @default(0)
+  serviceFee        Float           @default(0)
+  totalPrice        Float
+  currency          String          @default("XOF")
+  notes             String?
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  sourcingRequest   SourcingRequest @relation(fields: [sourcingRequestId], references: [id], onDelete: Cascade)
+}
+
+model SourcingEvent {
+  id                String          @id @default(cuid())
+  sourcingRequestId String
+  adminId           String?
+  action            String
+  message           String
+  createdAt         DateTime        @default(now())
+  sourcingRequest   SourcingRequest @relation(fields: [sourcingRequestId], references: [id], onDelete: Cascade)
+}
+
+model Attachment {
+  id                String           @id @default(cuid())
+  url               String
+  type              String
+  sourcingRequestId String?
+  createdAt         DateTime         @default(now())
+  sourcingRequest   SourcingRequest? @relation(fields: [sourcingRequestId], references: [id], onDelete: Cascade)
+}
+
+model ShippingCorridor {
+  id            String        @id @default(cuid())
+  origin        String
+  destination   String
+  transportType TransportType @default(AIR)
+  isActive      Boolean       @default(true)
+  carrierInfo   String?
+  estimatedDays String?
+  pricePerKg    Float?
+  createdAt     DateTime      @default(now())
+}
+
+model FreightRule {
+  id                    String        @id @default(cuid())
+  originCountry         String
+  destinationCountry    String
+  transportMode         TransportType @default(AIR)
+  pricePerKg            Float?
+  pricePerCbm           Float?
+  minimumCharge         Float         @default(0)
+  volumetricDivisor     Float         @default(6000)
+  allowPayAtDestination Boolean       @default(true)
+  estimatedMinDays      Int
+  estimatedMaxDays      Int
+  isActive              Boolean       @default(true)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@unique([originCountry, destinationCountry, transportMode])
+}
+
+model ShipmentBatch {
+  id                 String               @id @default(cuid())
+  batchNumber        String               @unique
+  originCountry      String
+  destinationCountry String
+  transportMode      TransportType
+  status             BatchStatus          @default(OPEN)
+  totalWeight        Float                @default(0)
+  totalVolume        Float                @default(0)
+  containerType      ContainerType?
+  cargoId            String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  containerNumber    String?
+  sealNumber         String?
+  orders             Order[]
+  statusHistory      OrderStatusHistory[]
+  cargo              Cargo?               @relation(fields: [cargoId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  profileId String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String
+  createdAt DateTime @default(now())
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String?
+  profileId     String
+  amount        Float
+  currency      String        @default("USD")
+  status        PaymentStatus @default(PENDING)
+  method        PaymentMethod
+  transactionId String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  order         Order?        @relation(fields: [orderId], references: [id])
+  profile       Profile       @relation(fields: [profileId], references: [id])
+}
+
+model Commission {
+  id        String   @id @default(cuid())
+  shopId    String
+  amount    Float
+  rate      Float
+  orderId   String?  @unique
+  createdAt DateTime @default(now())
+  shop      Shop     @relation(fields: [shopId], references: [id])
+}
+
+model FinancialTransaction {
+  id               String           @id @default(cuid())
+  orderId          String?          @unique
+  shopId           String
+  totalAmount      Float
+  commissionAmount Float
+  netAmount        Float
+  status           FinancialStatus  @default(PENDING)
+  adminNotes       String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  events           FinancialEvent[]
+  order            Order?           @relation(fields: [orderId], references: [id])
+  shop             Shop             @relation(fields: [shopId], references: [id])
+}
+
+model FinancialEvent {
+  id            String                @id @default(cuid())
+  shopId        String
+  transactionId String?
+  adminId       String?
+  eventType     String
+  message       String
+  createdAt     DateTime              @default(now())
+  shop          Shop                  @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  transaction   FinancialTransaction? @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  ADMIN
+  VENDOR
+  CLIENT
+  CARGO
+}
+
+enum CargoType {
+  PARTNER
+  SHARUFA
+}
+
+enum TrackingStatus {
+  RECEIVED_AT_WAREHOUSE
+  IN_CONSOLIDATION
+  SHIPPED
+  IN_TRANSIT
+  ARRIVED_DESTINATION
+  IN_CUSTOMS
+  OUT_FOR_DELIVERY
+  DELIVERED
+}
+
+enum QualityCheckStatus {
+  PENDING
+  APPROVED
+  FAILED
+}
+
+enum VendorStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ShopStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+  ARCHIVED
+}
+
+enum ShopVerificationStatus {
+  INCOMPLETE
+  SUBMITTED
+  VERIFIED
+  EXPIRED
+  RENEWAL_REQUIRED
+}
+
+enum ShopDocumentType {
+  TRADE_LICENSE
+  RIB
+  VAT_CERTIFICATE
+  NATIONAL_ID
+  PASSPORT
+  OTHER
+}
+
+enum ShopDocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+enum ShopType {
+  FASHION_STORE
+  BEAUTY_STORE
+  HOME_STORE
+  ELECTRONICS_STORE
+  VEHICLE_SHOWROOM
+  AUTO_PARTS_STORE
+  CONSTRUCTION_STORE
+  PACKAGING_STORE
+  FMCG_STORE
+  FOOD_STORE
+  INDUSTRIAL_STORE
+  KIDS_STORE
+  GENERAL_STORE
+  WHOLESALE_STORE
+}
+
+enum SourcingStatus {
+  NEW
+  UNDER_REVIEW
+  NEEDS_INFO
+  QUOTED
+  ACCEPTED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum SourcingType {
+  BUY_FOR_ME
+  B2B
+}
+
+enum LogisticsStatus {
+  NEW_ORDER
+  TO_PREPARE
+  READY_FOR_DROPOFF
+  DROPPED_AT_CARGO
+  RECEIVED_BY_CARGO
+  VERIFIED_COMPLIANT
+  REJECTED_BY_CARGO
+  SHIPPED
+  IN_TRANSIT
+  READY_FOR_DELIVERY
+  DELIVERED
+}
+
+enum OrderStatus {
+  NEW
+  CONFIRMED
+  PROCESSING
+  READY_TO_SHIP
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  ISSUE
+}
+
+enum OrderSourceType {
+  MARKETPLACE
+  SOURCING
+  INTERNAL
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  STRIPE
+  PAYPAL
+  CRYPTO
+  BANK_TRANSFER
+}
+
+enum FreightPaymentMode {
+  PREPAID
+  PAY_AT_DESTINATION
+}
+
+enum BatchStatus {
+  OPEN
+  CONSOLIDATING
+  SHIPPED
+  ARRIVED
+  DELIVERED
+  CANCELLED
+}
+
+enum ContainerType {
+  FT20
+  FT40
+}
+
+enum FinancialStatus {
+  PENDING
+  ELIGIBLE
+  ON_HOLD
+  PAID
+}
+
+enum TransportType {
+  AIR
+  SEA
+  ROAD
+}
+
+enum ProductStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  NEEDS_CORRECTION
+}

@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./app/*"],
+      "@components/*": ["./components/*"],
+      // DETTE TECHNIQUE TEMPORAIRE : Alias pour accéder aux dépendances racines non migrées
+      // Objectif futur : Remplacer par des imports depuis les packages (@sharufa/db, etc.)
+      "@root/*": ["../../src/*"],
+      "@sharufa/shared": ["../../packages/shared"],
+      "@sharufa/ui": ["../../packages/ui"],
+      "@sharufa/auth": ["../../packages/auth"],
+      "@sharufa/db": ["../../packages/db"],
+      "@sharufa/emails": ["../../packages/emails"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

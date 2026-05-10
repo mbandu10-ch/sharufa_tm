@@ -1,0 +1,95 @@
+# dependencies
+node_modules
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# next.js build artifacts
+.next/
+/out/
+/build
+dist/
+apps/**/.next/
+apps/**/out/
+apps/**/build/
+apps/**/dist/
+
+# env files (NEVER COMMIT THESE)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+.env.test
+*.env
+
+# testing
+/coverage
+
+# misc
+.DS_Store
+*.pem
+*.key
+*.cert
+*.crt
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# prisma
+/src/generated/prisma
+
+# workspace specific ignores
+scratch/
+tmp/
+ts_errors.log
+lint_output.txt
+import_temp/
+*.log
+*.sqlite
+
+# Security: deploy artifacts, archives, backups
+*.zip
+*.tar.gz
+*.tgz
+*.sql
+*.dump
+*.backup
+deploy/
+deploy-ready/
+build_log*.txt
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# User specific ignores
+Telegram\ Desktop/
+*.txt
+*.md
+!README.md
+!apps/**/*.md
+!packages/**/*.md
+!CONTRIBUTING.md
+!CHANGELOG.md
+scripts/archive/
+scripts/audits-checks/
+scripts/database-fixes/
+scripts/import/

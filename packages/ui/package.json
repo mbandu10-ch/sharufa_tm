@@ -1,0 +1,10 @@
+{
+  "name": "@sharufa/ui",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "dependencies": {
+    "@sharufa/shared": "*"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@sharufa/app-admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3003",
+    "build": "next build",
+    "start": "next start -p 3003",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@sharufa/auth": "*",
+    "@sharufa/db": "*",
+    "@sharufa/emails": "*",
+    "@sharufa/shared": "*",
+    "@sharufa/ui": "*",
+    "@supabase/ssr": "^0.9.0",
+    "framer-motion": "^12.14.0",
+    "lucide-react": "^0.511.0",
+    "next": "16.2.1",
+    "next-intl": "^4.11.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  }
+}

@@ -1,0 +1,10 @@
+export * from './constants/countries'
+export * from './constants/shop-categories'
+export * from './constants/vehicles'
+export * from './utils/slugify'
+export * from './utils/image'
+export * from './utils/utils'
+export * from './utils/upload-validation'
+export * from './utils/product-utils'
+export * from './utils/config'
+export const locales = ['fr', 'en', 'tr'];

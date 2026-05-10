@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*", "../../src/*"],
+      "@root/*": ["../../src/*"],
+      "@components/*": ["../../src/components/*"],
+      "@sharufa/shared": ["../../packages/shared"],
+      "@sharufa/ui": ["../../packages/ui"],
+      "@sharufa/auth": ["../../packages/auth"],
+      "@sharufa/db": ["../../packages/db"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

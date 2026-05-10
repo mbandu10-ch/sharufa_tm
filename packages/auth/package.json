@@ -1,0 +1,15 @@
+{
+  "name": "@sharufa/auth",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./server": "./server.ts",
+    "./client": "./client.ts"
+  },
+  "types": "./index.ts",
+  "dependencies": {
+    "@sharufa/db": "*"
+  }
+}
