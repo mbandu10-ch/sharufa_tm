@@ -1,0 +1,11 @@
+{
+  "monthly": {
+    "amount": 2999,
+    "display": "29.99"
+  },
+  "yearly": {
+    "amount": 29990,
+    "display": "299.90"
+  },
+  "currency": "eur"
+}
