@@ -5,12 +5,15 @@ WORKDIR /app
 COPY package*.json ./
 COPY packages/ ./packages/
 COPY apps/ ./apps/
+COPY prisma/ ./prisma/
 RUN npm install --include=dev
+RUN npx prisma generate
 
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN npx prisma generate
 RUN npm run build -w @sharufa/app-web
 
 FROM base AS runner
