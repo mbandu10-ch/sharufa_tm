@@ -1,0 +1,15 @@
+.env
+.env.*
+*.orig
+*.bak
+*.swp
+*.copy
+node_modules
+.next
+.git
+scratch/
+tmp/
+scripts/
+audit_*.md
+build_log*.txt
+sharufa_code_for_audit.md
