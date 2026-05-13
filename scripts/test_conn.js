@@ -2,14 +2,14 @@ const { Client } = require('pg');
 require('dotenv').config();
 
 // Test Direct Host instead of pooler
-const connectionString = "postgresql://postgres.jaahszatxsvrondptyeq:PcxXFBkovfnC5Yi5@db.jaahszatxsvrondptyeq.supabase.co:5432/postgres";
+const connectionString = process.env.DIRECT_URL;
 
 const client = new Client({
   connectionString: connectionString,
   ssl: { rejectUnauthorized: false }
 });
 
-console.log('🔌 Testing direct connection to: db.jaahszatxsvrondptyeq.supabase.co...');
+console.log('🔌 Testing direct connection via DIRECT_URL...');
 
 client.connect()
   .then(() => {
