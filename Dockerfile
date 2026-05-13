@@ -6,6 +6,7 @@ COPY package*.json ./
 COPY packages/ ./packages/
 COPY apps/ ./apps/
 COPY prisma/ ./prisma/
+COPY prisma.config.ts ./
 RUN npm install --include=dev
 RUN npx prisma generate
 
