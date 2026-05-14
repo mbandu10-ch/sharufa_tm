@@ -19,6 +19,12 @@ import { StepExploration } from '@/components/marketplace/StepExploration';
 import { MarketplacePagination } from '@/components/marketplace/MarketplacePagination';
 import { MobileCategoryDrawer } from '@/components/marketplace/MobileCategoryDrawer';
 import { MarketplaceMobileDiscovery } from '@/components/marketplace/MarketplaceMobileDiscovery';
+import { MarketplaceHeader } from '@/components/marketplace/MarketplaceHeader';
+import { MarketplaceCategoryGrid } from '@/components/marketplace/MarketplaceCategoryGrid';
+import { MarketplaceInfoBar } from '@/components/marketplace/MarketplaceInfoBar';
+import { MarketplaceSheinHero } from '@/components/marketplace/MarketplaceSheinHero';
+import { MarketplaceCommercialSections } from '@/components/marketplace/MarketplaceCommercialSections';
+import { MarketplaceProductsGrid } from '@/components/marketplace/MarketplaceProductsGrid';
 
 export default async function MarketplacePage({ 
   searchParams,
@@ -37,6 +43,7 @@ export default async function MarketplacePage({
   const groupSlug = params.group;
   const itemSlug = params.item;
   const shopType = params.shopType;
+  const isHomeView = !groupSlug && !categorySlug && !query && !countryCode && currentView === 'products'
 
   const tNav = await getTranslations('NavigationGroups');
   const t = await getTranslations('Marketplace');
@@ -149,7 +156,7 @@ export default async function MarketplacePage({
   }))
 
   const page = Number(params.page) || 1
-  const limit = 24
+  const limit = 45 // 45 produits = 3 lignes de 15 colonnes, idéal pour défilement horizontal
   const skip = (page - 1) * limit
 
   // 2. Fetch Products
@@ -171,8 +178,38 @@ export default async function MarketplacePage({
     ...(countryCode && { originCountry: { code: countryCode } })
   }
 
-  const [productsRaw, totalProducts] = await Promise.all([
-    prisma.product.findMany({
+  let productsRaw: any[] = [];
+  let totalProducts = await prisma.product.count({ where: productWhere })
+
+  if (isHomeView) {
+    // Vrai affichage aléatoire pour la vue d'accueil : on donne une chance à tous les vendeurs/catégories
+    // 1. Récupérer tous les IDs correspondant (très léger en mémoire)
+    const allIds = await prisma.product.findMany({
+      where: productWhere,
+      select: { id: true }
+    });
+
+    // 2. Mélanger tous les IDs de manière aléatoire
+    const shuffledIds = allIds.sort(() => 0.5 - Math.random()).map(p => p.id);
+    
+    // 3. Prendre juste la portion de la page actuelle
+    const paginatedIds = shuffledIds.slice(skip, skip + limit);
+
+    // 4. Charger les données complètes uniquement pour ces IDs
+    productsRaw = await prisma.product.findMany({
+      where: { id: { in: paginatedIds } },
+      include: {
+        shop: true,
+        originCountry: true,
+        category: {
+            include: { translations: { where: { locale } } }
+        },
+        translations: { where: { locale } }
+      }
+    });
+  } else {
+    // Si l'utilisateur fait une recherche ou applique un filtre, on garde le tri par nouveauté/pertinence
+    productsRaw = await prisma.product.findMany({
       where: productWhere,
       include: {
         shop: true,
@@ -185,11 +222,10 @@ export default async function MarketplacePage({
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit
-    }),
-    prisma.product.count({ where: productWhere })
-  ])
+    });
+  }
 
-  const products = productsRaw.map(p => ({
+  let products = productsRaw.map(p => ({
     ...p,
     name: p.translations[0]?.name || p.name,
     description: p.translations[0]?.description || p.description,
@@ -198,6 +234,9 @@ export default async function MarketplacePage({
         name: p.category.translations[0]?.name || p.category.name
     }
   }))
+
+  // Mélange aléatoire (shuffle) pour avoir une vue différente et variée (habits, tech, etc.)
+  products = products.sort(() => Math.random() - 0.5)
 
   // 3. Fetch Shops
   const shops = await prisma.shop.findMany({
@@ -238,7 +277,7 @@ export default async function MarketplacePage({
       products: { 
         where: { 
           status: 'APPROVED',
-          ...(targetCategoryIds.length > 0 ? { categoryId: { in: targetCategoryIds } } : (groupSlug || categorySlug ? { categoryId: { in: ['none'] } } : {}))
+          ...(targetCategoryIds.length > 0 ? { categoryId: { in: targetCategoryIds } } : (groupSlug || categorySlug ? { categoryId: { in: ['none'] } } : { }))
         },
         include: { translations: { where: { locale } } },
         take: 3 
@@ -248,7 +287,6 @@ export default async function MarketplacePage({
   })
 
   // 4. Fetch Commercial Data (for home view)
-  const isHomeView = !groupSlug && !categorySlug && !query && !countryCode && currentView === 'products'
   
   const fetchLocalProducts = async (where: any, take: number) => {
     const raw = await prisma.product.findMany({
@@ -275,39 +313,32 @@ export default async function MarketplacePage({
   const newArrivals = isHomeView ? await fetchLocalProducts({ status: 'APPROVED' }, 4) : []
   const topSales = isHomeView ? await fetchLocalProducts({ status: 'APPROVED' }, 4) : []
 
+  // 5. Fetch Cheapest Products for Hero
+  const cheapestProductsRaw = isHomeView ? await prisma.product.findMany({
+    where: { 
+        status: 'APPROVED',
+        shop: { status: 'APPROVED', isVisible: true },
+        price: { gt: 0 }
+    },
+    orderBy: { price: 'asc' },
+    take: 10,
+    include: {
+      translations: { where: { locale } }
+    }
+  }) : []
+
+  const cheapestProductsHero = cheapestProductsRaw.map(p => ({
+    ...p,
+    name: p.translations[0]?.name || p.name,
+  }))
+
+
   return (
-    <div className="min-h-screen bg-muted/30 pb-20">
-      {/* Search & Header simplified */}
-      <div className="bg-primary pt-24 pb-16 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-secondary/5 skew-x-12 transform translate-x-1/2" />
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-6">
-            <h1 className="text-3xl md:text-5xl font-outfit font-black tracking-tight leading-none uppercase italic">
-              Marketplace <span className="text-secondary italic">Sharufa</span>
-            </h1>
-            
-            <form action="/marketplace" method="GET" className="flex flex-col md:flex-row gap-4 bg-white/10 p-2 rounded-[32px] backdrop-blur-xl border border-white/20 shadow-2xl">
-              <input type="hidden" name="view" value={currentView} />
-              <div className="flex-grow flex items-center px-6 gap-3">
-                <Search className="text-secondary w-6 h-6" />
-                <input 
-                  name="q"
-                  type="text" 
-                  placeholder={t('search_placeholder')} 
-                  defaultValue={query}
-                  className="bg-transparent border-none focus:outline-none focus:ring-0 w-full py-3 md:py-4 text-base text-white placeholder:text-white/40"
-                />
-              </div>
-              <Button type="submit" className="bg-secondary text-primary font-black px-10 py-5 rounded-2xl hover:bg-white transition-all text-base shadow-lg">
-                {t('explore')}
-              </Button>
-            </form>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#F7F7F7] pb-20">
+      <MarketplaceHeader />
 
       {/* Tabs & Filters Navigation */}
-      <div className="container mx-auto px-4 -mt-8 relative z-20">
+      <div className="container mx-auto px-4 mt-8 relative z-20">
         <Tabs key={currentView} defaultValue={currentView} className="w-full">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6 bg-background rounded-[40px] p-4 shadow-2xl border border-border">
             <TabsList className="bg-muted/50 p-1.5 rounded-3xl h-auto flex-wrap sm:flex-nowrap justify-center gap-2">
@@ -321,11 +352,6 @@ export default async function MarketplacePage({
                   <Store size={16} /> Boutiques
                 </TabsTrigger>
               </Link>
-              <Link href={`/marketplace?view=countries&q=${query}`} scroll={false}>
-                <TabsTrigger value="countries" className="rounded-2xl px-4 py-3 sm:px-8 sm:py-4 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase text-[10px] sm:text-xs tracking-widest flex gap-2">
-                  <Globe size={16} /> Destinations
-                </TabsTrigger>
-              </Link>
             </TabsList>
 
             <MarketplaceFilters 
@@ -333,18 +359,18 @@ export default async function MarketplacePage({
             />
           </div>
 
-          <div className="mt-16 flex flex-col lg:flex-row gap-12">
-            {/* Left Sidebar */}
-            <div className="hidden lg:block w-80 space-y-12">
-              <CategorySidebar 
-                currentGroupId={groupSlug} 
-                currentItemId={itemSlug} 
-                currentCategorySlug={categorySlug}
-                categories={sidebarCategories}
-              />
-            </div>
+          <div className="mt-8">
+            {(isHomeView || groupSlug) && (
+              <>
+                {isHomeView && <MarketplaceSheinHero products={cheapestProductsHero} />}
+                {!groupSlug && <MarketplaceCategoryGrid />}
+              </>
+            )}
+          </div>
 
-            {/* Mobile Sidebar Trigger */}
+          <div className="mt-16 flex flex-col lg:flex-row gap-12">
+            {/* Left Sidebar - Removed per request */}
+
             {/* Mobile Sidebar Trigger */}
             <div className="lg:hidden fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
                 <MobileCategoryDrawer 
@@ -387,9 +413,7 @@ export default async function MarketplacePage({
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mb-8">
-                <MarketplaceBreadcrumbs groupId={groupSlug} itemId={itemSlug} />
-              </div>
+              {/* Breadcrumbs removed per request for cleaner UI */}
               
               {/* Step Exploration (Only if products view and not searching by query) */}
               {currentView === 'products' && !query && (
@@ -409,75 +433,7 @@ export default async function MarketplacePage({
 
               {/* Products Grid */}
               <TabsContent value="products" className="mt-0 space-y-8">
-                <div className="flex items-center justify-between border-b border-border pb-6 mb-8">
-                   <h2 className="text-2xl md:text-3xl font-black font-outfit tracking-tight text-primary">
-                      {groupSlug || categorySlug ? (
-                        <>Affichage de votre <span className="text-secondary">sélection</span></>
-                      ) : (
-                        <>Tous les <span className="text-secondary">Produits</span></>
-                      )}
-                   </h2>
-                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest bg-muted/50 px-4 py-2 rounded-full">
-                      {totalProducts} produits
-                   </p>
-                </div>
-
-                <div className={cn(
-                  "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8",
-                  isHomeView && "hidden lg:grid" // Hide default grid on mobile if home (handled by discovery)
-                )}>
-                  {products.length > 0 ? products.map((product) => (
-                    <Link 
-                      key={product.id} 
-                      href={`/product/${product.slug}`}
-                      className="group bg-background rounded-2xl md:rounded-[32px] overflow-hidden border border-border shadow-sm hover:shadow-2xl transition-all hover:-translate-y-2 flex flex-col"
-                    >
-                      <div className="relative aspect-[4/5] overflow-hidden">
-                        <img 
-                          src={product.images[0] || 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=400'} 
-                          alt={product.name}
-                          className="w-full h-full object-contain md:object-contain transition-transform duration-700"
-                        />
-                        <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white/90 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-                          <span className="text-[8px] md:text-xs font-black text-primary">{product.originCountry?.flag} {product.originCountry?.code}</span>
-                        </div>
-                      </div>
-                      <div className="p-3 md:p-6 space-y-2 md:space-y-4 flex-grow flex flex-col">
-                        <div className="space-y-1">
-                          <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-secondary">{product.category.name}</p>
-                          <h3 className="text-sm md:text-lg font-bold font-outfit line-clamp-1 text-primary">{product.name}</h3>
-                        </div>
-                        <div className="mt-auto">
-                          <div className="flex items-center justify-between">
-                            {product.price > 0 ? (
-                              <>
-                                <span className="text-base md:text-2xl font-black text-primary">$ {product.price.toFixed(2)}</span>
-                                <div className="hidden md:flex w-10 h-10 rounded-full bg-secondary/10 items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-primary transition-colors">
-                                  <ShoppingBag size={18} />
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <span className="text-[10px] md:text-sm font-black text-muted-foreground uppercase tracking-wider">Sur demande</span>
-                                <div className="hidden md:flex w-10 h-10 rounded-full bg-primary/10 items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                                  <Search size={18} />
-                                </div>
-                              </>
-                            )}
-                          </div>
-                          <div className="pt-2 mt-2 border-t flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">
-                             <Store size={10} className="text-secondary shrink-0" /> {product.shop?.name}
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  )) : (
-                    <div className="col-span-full py-20 text-center space-y-4">
-                      <Package className="mx-auto w-16 h-16 text-muted-foreground opacity-20" />
-                      <p className="text-xl text-muted-foreground font-medium">Aucun produit trouvé</p>
-                    </div>
-                  )}
-                </div>
+                <MarketplaceProductsGrid products={products} isHomeView={isHomeView} />
 
                 <MarketplacePagination 
                    totalItems={totalProducts}
@@ -490,35 +446,16 @@ export default async function MarketplacePage({
                 <ShopFilters countries={countries.map(c => ({ id: c.id, name: c.name, code: c.code, flag: c.flag }))} />
                 <ShopGrid shops={shops} />
               </TabsContent>
-
-              <TabsContent value="countries" className="mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {countries.map((c) => (
-                    <CountryCard 
-                      key={c.id} 
-                      country={{
-                        id: c.id,
-                        name: c.name,
-                        code: c.code,
-                        image: c.code === 'AE' 
-                          ? 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=80&w=800' 
-                          : c.code === 'TR'
-                          ? 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=800'
-                          : 'https://images.unsplash.com/photo-1508433957232-41487cc5652f?auto=format&fit=crop&q=80&w=800',
-                        description: c.code === 'AE' 
-                          ? 'Le Hub mondial du luxe et de la technologie.' 
-                          : c.code === 'TR'
-                          ? 'Qualité européenne et savoir-faire traditionnel.'
-                          : 'La plus grande usine du monde.'
-                      }} 
-                    />
-                  ))}
-                </div>
-              </TabsContent>
             </div>
           </div>
         </Tabs>
       </div>
+
+      {isHomeView && (
+        <div className="mt-20">
+          <MarketplaceCommercialSections />
+        </div>
+      )}
     </div>
   )
 }

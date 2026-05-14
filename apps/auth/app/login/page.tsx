@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Globe, ShieldCheck, Truck, Wallet } from 'lucide-react'
 import { Logo } from '@sharufa/ui/components/Logo'
 import { login } from '@/auth/actions'
 import { Button } from '@sharufa/ui/components/button'
@@ -19,18 +20,72 @@ export default async function LoginPage({
         <div className="absolute inset-0 bg-primary" />
         <div className="relative z-20 flex items-center text-lg font-medium">
           <Link href="/" className="flex items-center gap-2">
-            <Logo iconOnly className="w-10 h-10" variant="dark" />
+            <Logo iconOnly className="w-7 h-7" variant="dark" />
             <span className="font-bold tracking-tight text-white uppercase text-xl font-outfit">
               SHARUFA<span className="text-secondary">.COM</span>
             </span>
           </Link>
         </div>
+
+        <div className="relative z-20 mt-12 space-y-8">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-black font-outfit uppercase tracking-tight text-white">
+              Votre pont vers le <span className="text-secondary">Commerce Mondial</span>
+            </h2>
+            <p className="text-white/70 text-lg font-medium max-w-[400px]">
+              La première marketplace qui connecte directement l'Afrique aux hubs de sourcing mondiaux.
+            </p>
+          </div>
+
+          <div className="grid gap-6">
+            <div className="flex items-start gap-4">
+              <div className="bg-white/10 p-2.5 rounded-xl border border-white/10">
+                <Globe className="w-6 h-6 text-secondary" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white uppercase text-sm tracking-wider">Sourcing Direct</h3>
+                <p className="text-white/60 text-sm">Achetez à la source : Dubaï, Turquie et Chine.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="bg-white/10 p-2.5 rounded-xl border border-white/10">
+                <ShieldCheck className="w-6 h-6 text-secondary" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white uppercase text-sm tracking-wider">Fournisseurs Vérifiés</h3>
+                <p className="text-white/60 text-sm">Sécurité totale avec des boutiques auditées.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="bg-white/10 p-2.5 rounded-xl border border-white/10">
+                <Truck className="w-6 h-6 text-secondary" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white uppercase text-sm tracking-wider">Logistique Cargo</h3>
+                <p className="text-white/60 text-sm">Expédition simplifiée vers toute l'Afrique.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="bg-white/10 p-2.5 rounded-xl border border-white/10">
+                <Wallet className="w-6 h-6 text-secondary" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white uppercase text-sm tracking-wider">Paiements Locaux</h3>
+                <p className="text-white/60 text-sm">Payez en toute simplicité dans votre devise.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2">
-            <p className="text-lg">
+          <blockquote className="space-y-2 border-l-4 border-secondary pl-6">
+            <p className="text-lg italic text-white/90">
               &ldquo;L'accès simplifié aux marchés de Dubaï, Turquie et Chine change la donne pour les entrepreneurs africains.&rdquo;
             </p>
-            <footer className="text-sm">Abdoulaye K., Client Sharufa</footer>
+            <footer className="text-sm font-bold uppercase tracking-widest text-secondary">Abdoulaye K., Client Sharufa</footer>
           </blockquote>
         </div>
       </div>

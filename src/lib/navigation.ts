@@ -73,10 +73,10 @@ export const NAVIGATION_GROUPS: NavigationGroup[] = [
     name: 'Électronique & Technologie',
     icon: Smartphone,
     items: [
-      { id: 'smartphones', name: 'Smartphones & Tablettes', categorySlugs: ['electronique-legere', 'acc-tel'] },
-      { id: 'informatique', name: 'Informatique', categorySlugs: ['electronique-legere', 'laptops'] },
-      { id: 'audio', name: 'Audio & Son', categorySlugs: ['electronique-legere', 'casques'] },
-      { id: 'tv-photo', name: 'TV & Photographie', categorySlugs: ['electronique-legere'] }
+      { id: 'smartphones', name: 'Smartphones & Tablettes', categorySlugs: ['smart-devices', 'acc-tel', 'electronique-legere'] },
+      { id: 'informatique', name: 'Informatique', categorySlugs: ['laptops', 'electronique-legere'] },
+      { id: 'audio', name: 'Audio & Son', categorySlugs: ['casques', 'electronique-legere'] },
+      { id: 'tv-photo', name: 'TV & Photographie', categorySlugs: ['tv-camera', 'electronique-legere'] }
     ]
   },
   {
@@ -85,7 +85,7 @@ export const NAVIGATION_GROUPS: NavigationGroup[] = [
     icon: Home,
     items: [
       { id: 'decoration', name: 'Décoration & Mobilier', categorySlugs: ['maison-deco', 'mobilier'] },
-      { id: 'cuisine', name: 'Cuisine & Ustensiles', categorySlugs: ['maison-deco', 'cuisine'] }
+      { id: 'cuisine', name: 'Cuisine & Ustensiles', categorySlugs: ['cuisine-v2', 'cuisine'] }
     ]
   },
   {
@@ -93,10 +93,10 @@ export const NAVIGATION_GROUPS: NavigationGroup[] = [
     name: 'Beauté & Soins',
     icon: Sparkles,
     items: [
-      { id: 'maquillage', name: 'Maquillage', categorySlugs: ['beaute'] },
-      { id: 'soins', name: 'Soins visage & corps', categorySlugs: ['beaute'] },
-      { id: 'parfums', name: 'Parfums', categorySlugs: ['beaute'] },
-      { id: 'cheveux', name: 'Soins capillaires', categorySlugs: ['beaute'] }
+      { id: 'maquillage', name: 'Maquillage', categorySlugs: ['beauty-makeup', 'beaute'] },
+      { id: 'soins', name: 'Soins visage & corps', categorySlugs: ['beauty-skincare', 'beaute'] },
+      { id: 'parfums', name: 'Parfums', categorySlugs: ['beauty-perfume', 'beaute'] },
+      { id: 'cheveux', name: 'Soins capillaires', categorySlugs: ['beauty-haircare', 'beaute'] }
     ]
   },
   {
@@ -104,9 +104,9 @@ export const NAVIGATION_GROUPS: NavigationGroup[] = [
     name: 'Véhicules & Mobilité',
     icon: Car,
     items: [
-      { id: 'auto-moto', name: 'Voitures & Motos', categorySlugs: ['voitures', 'motos-scooters'] },
+      { id: 'auto-moto', name: 'Voitures & Motos', categorySlugs: ['voitures-v2', 'voitures', 'motos-scooters'] },
       { id: 'mobilite-douce', name: 'Mobilité douce', categorySlugs: ['velos-mobilite'] },
-      { id: 'pieces-auto', name: 'Pièces & Entretien', categorySlugs: ['accessoires-auto', 'pieces-auto', 'entretien-auto'] }
+      { id: 'pieces-auto', name: 'Pièces & Entretien', categorySlugs: ['pieces-auto-v2', 'accessoires-auto', 'pieces-auto', 'entretien-auto'] }
     ]
   },
   {
@@ -116,7 +116,7 @@ export const NAVIGATION_GROUPS: NavigationGroup[] = [
     items: [
       { id: 'outillage', name: 'Outillage', categorySlugs: ['outillage'] },
       { id: 'materiaux', name: 'Matériaux de base', categorySlugs: ['construction'] },
-      { id: 'technique', name: 'Électricité & Plomberie', categorySlugs: ['technique'] }
+      { id: 'technique', name: 'Électricité & Plomberie', categorySlugs: ['electricite-plomberie', 'technique'] }
     ]
   },
   {
@@ -133,8 +133,8 @@ export const NAVIGATION_GROUPS: NavigationGroup[] = [
     name: 'Produits ménagers & Hygiène',
     icon: Droplets,
     items: [
-      { id: 'entretien', name: 'Entretien Maison', categorySlugs: ['hygiene'] },
-      { id: 'hygiene', name: 'Hygiène & Papier', categorySlugs: ['hygiene'] }
+      { id: 'entretien', name: 'Entretien Maison', categorySlugs: ['entretien-maison', 'hygiene'] },
+      { id: 'hygiene', name: 'Hygiène & Papier', categorySlugs: ['hygiene-papier', 'hygiene'] }
     ]
   },
   {
@@ -142,11 +142,11 @@ export const NAVIGATION_GROUPS: NavigationGroup[] = [
     name: 'Enfants & Bébé',
     icon: Baby,
     items: [
-      { id: 'bebe-vetements', name: 'Vêtements Bébé', categorySlugs: ['vetements-bebe-0-24'] },
-      { id: 'bebe-puericulture', name: 'Puériculture', categorySlugs: ['puericulture-bebe'] },
-      { id: 'bebe-alimentation', name: 'Alimentation', categorySlugs: ['alimentation-bebe'] },
-      { id: 'bebe-soins', name: 'Soins & Hygiène', categorySlugs: ['soins-hygiene-bebe'] },
-      { id: 'bebe-sante', name: 'Santé & Sécurité', categorySlugs: ['sante-securite-bebe'] },
+      { id: 'bebe-vetements', name: 'Vêtements Bébé', categorySlugs: ['bebe-habille', 'vetements-bebe-0-24'] },
+      { id: 'bebe-puericulture', name: 'Puériculture', categorySlugs: ['bebe-pueri-v2', 'puericulture-bebe'] },
+      { id: 'bebe-alimentation', name: 'Alimentation', categorySlugs: ['bebe-alim-v2', 'alimentation-bebe'] },
+      { id: 'bebe-soins', name: 'Soins & Hygiène', categorySlugs: ['bebe-soins-v2', 'soins-hygiene-bebe'] },
+      { id: 'bebe-sante', name: 'Santé & Sécurité', categorySlugs: ['bebe-sante-v2', 'sante-securite-bebe'] },
       { id: 'bebe-jouets', name: 'Jouets & Éveil', categorySlugs: ['jouets-eveil-bebe'] },
       { id: 'bebe-chambre', name: 'Chambre Bébé', categorySlugs: ['chambre-bebe'] },
       { id: 'maman-maternite', name: 'Maman & Maternité', categorySlugs: ['maman-maternite-bebe'] }
@@ -157,7 +157,7 @@ export const NAVIGATION_GROUPS: NavigationGroup[] = [
     name: 'Industrie & Équipements',
     icon: Factory,
     items: [
-      { id: 'machines', name: 'Machines & Équipements', categorySlugs: ['industrie'] },
+      { id: 'machines', name: 'Machines & Équipements', categorySlugs: ['industrie-v3', 'industrie'] },
       { id: 'securite', name: 'Sécurité & EPI', categorySlugs: ['securite'] },
       { id: 'commercial', name: 'Fournitures commerciales', categorySlugs: ['pro'] }
     ]

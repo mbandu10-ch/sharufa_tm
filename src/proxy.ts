@@ -69,12 +69,15 @@ export default async function proxy(request: NextRequest) {
   // 3. OPTIONAL: Final Redirection to Standalone Web (Port 3000)
   // On ne l'active que si on veut forcer le port 3000 localement via le proxy.
   // En production, c'est l'orchestrateur qui s'en charge.
-  const isStandaloneWebEnabled = process.env.NEXT_PUBLIC_USE_STANDALONE_WEB === 'true';
-  const webPortalUrl = process.env.NEXT_PUBLIC_WEB_PORTAL_URL || 'http://localhost:3000';
-
-  if (isStandaloneWebEnabled) {
+  if (AUTH_CONFIG.USE_STANDALONE_WEB) {
     const currentPath = pathname;
-    const url = new URL(currentPath, webPortalUrl);
+    const url = new URL(currentPath, AUTH_CONFIG.WEB_PORTAL_URL);
+    
+    // Empêcher la boucle infinie si on est déjà sur le bon hôte
+    if (request.headers.get('host') === url.host) {
+      return response;
+    }
+
     request.nextUrl.searchParams.forEach((value, key) => url.searchParams.set(key, value));
     return NextResponse.redirect(url.toString());
   }

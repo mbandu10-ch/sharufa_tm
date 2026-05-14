@@ -171,12 +171,12 @@ export default function Navbar() {
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="rounded-xl py-3 cursor-pointer group">
-                        <Link href="/login" className="flex items-center w-full font-bold text-sm group-hover:text-secondary transition-colors">
+                        <Link href={`${process.env.NEXT_PUBLIC_AUTH_PORTAL_URL}/login`} className="flex items-center w-full font-bold text-sm group-hover:text-secondary transition-colors">
                           {t("login")}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="rounded-xl py-3 cursor-pointer group">
-                        <Link href="/register" className="flex items-center w-full font-bold text-sm group-hover:text-secondary transition-colors">
+                        <Link href={`${process.env.NEXT_PUBLIC_AUTH_PORTAL_URL}/register`} className="flex items-center w-full font-bold text-sm group-hover:text-secondary transition-colors">
                           {t("register")}
                         </Link>
                       </DropdownMenuItem>
@@ -232,7 +232,7 @@ export default function Navbar() {
                </Button>
             ) : (
               <Link
-                href="/login"
+                href={`${process.env.NEXT_PUBLIC_AUTH_PORTAL_URL}/login`}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-4 text-secondary font-black uppercase tracking-widest text-lg"
               >
