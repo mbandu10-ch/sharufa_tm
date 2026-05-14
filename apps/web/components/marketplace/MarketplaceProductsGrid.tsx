@@ -41,9 +41,7 @@ export function MarketplaceProductsGrid({ products, isHomeView }: { products: an
       {/* Grille sur 3 Lignes avec défilement horizontal */}
       <div 
         ref={scrollRef}
-        className="grid grid-rows-3 grid-flow-col gap-y-8 gap-x-6 pb-8 overflow-x-auto scrollbar-hide snap-x scroll-smooth relative z-10"
-        // 5 colonnes visibles : 100% / 5 = 20%. Moins la taille des espaces (gap-6 = 24px). (4 * 24) / 5 = 19.2px
-        style={{ gridAutoColumns: 'calc(20% - 19.2px)' }} 
+        className="grid grid-rows-3 grid-flow-col gap-y-8 gap-x-4 md:gap-x-6 pb-8 overflow-x-auto scrollbar-hide snap-x scroll-smooth relative z-10 auto-cols-[calc(50%-12px)] md:auto-cols-[calc(20%-19.2px)]"
       >
         {products.map((product) => (
           <Link 
