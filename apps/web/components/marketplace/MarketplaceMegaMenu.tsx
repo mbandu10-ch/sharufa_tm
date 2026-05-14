@@ -195,7 +195,7 @@ export function MarketplaceMegaMenu() {
                       {item.categorySlugs.map((slug) => {
                         // Récupérer le nom exact depuis le dictionnaire, et l'image locale générée par DALL-E
                         const name = CATEGORY_NAMES[slug] || slug.replace(/-/g, ' ')
-                        const imageUrl = `/categories/${slug}.jpg`
+                        const imageUrl = `/categories/${slug}.webp`
                         
                         return (
                           <Link 

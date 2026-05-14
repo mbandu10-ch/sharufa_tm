@@ -67,7 +67,7 @@ export function MarketplaceCategoryGrid() {
           {allItems.map((item, index) => {
              // Utiliser le premier slug de la catégorie pour l'image d'illustration
              const primarySlug = item.categorySlugs[0]
-             const img = `/categories/${primarySlug}.jpg`
+             const img = `/categories/${primarySlug}.webp`
              
              return (
               <Link 
