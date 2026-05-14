@@ -26,6 +26,19 @@ import { MarketplaceSheinHero } from '@/components/marketplace/MarketplaceSheinH
 import { MarketplaceCommercialSections } from '@/components/marketplace/MarketplaceCommercialSections';
 import { MarketplaceProductsGrid } from '@/components/marketplace/MarketplaceProductsGrid';
 
+const MOBILE_UNIVERS_IMAGES: Record<string, string> = {
+  'mode-accessoires': 'vetements-femme.webp',
+  'electronique-technologie': 'laptops.webp',
+  'maison-cuisine': 'maison-deco.webp',
+  'beaute-soins': 'beauty-makeup.webp',
+  'vehicules-mobilite': 'pieces-auto-v2.webp',
+  'construction-materiaux': 'outillage.webp',
+  'alimentaire-denrees': 'alimentaire.webp',
+  'menagers-hygiene': 'hygiene.webp',
+  'enfants-bebe': 'bebe-habille.webp',
+  'industrie-equipements': 'industrie-v3.webp',
+}
+
 export default async function MarketplacePage({ 
   searchParams,
   params: routeParams
@@ -396,10 +409,14 @@ export default async function MarketplacePage({
                         className="flex flex-col items-center gap-2 shrink-0 group"
                       >
                         <div className={cn(
-                          "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300",
-                          isSelected ? "bg-secondary text-primary shadow-lg shadow-secondary/20" : "bg-muted/50 text-primary group-hover:bg-secondary/20"
+                          "w-16 h-16 rounded-full overflow-hidden transition-all duration-300 border-2",
+                          isSelected ? "border-secondary shadow-lg shadow-secondary/20" : "border-transparent"
                         )}>
-                          <Icon size={24} />
+                          <img 
+                            src={`/categories/${MOBILE_UNIVERS_IMAGES[group.id] || 'accessoires.webp'}`} 
+                            alt={group.name}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <span className={cn(
                           "text-[9px] font-black uppercase tracking-tighter text-center w-16 line-clamp-2 transition-colors",

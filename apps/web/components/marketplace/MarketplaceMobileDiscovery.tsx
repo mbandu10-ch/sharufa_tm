@@ -50,7 +50,7 @@ export function MarketplaceMobileDiscovery({
             <Link 
               key={product.id} 
               href={`/product/${product.slug}`}
-              className="w-40 shrink-0 bg-white rounded-3xl overflow-hidden border border-border shadow-sm"
+              className="w-40 shrink-0 bg-white rounded-[2rem] overflow-hidden border border-border/40 shadow-sm transition-transform active:scale-95"
             >
               <div className="aspect-square relative overflow-hidden bg-muted">
                 <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
@@ -88,15 +88,15 @@ export function MarketplaceMobileDiscovery({
               <Link 
                 key={product.id} 
                 href={`/product/${product.slug}`}
-                className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-border shadow-sm group"
+                className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-border/40 shadow-sm group active:bg-muted/30 transition-colors"
               >
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted shrink-0">
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted shrink-0 border border-border/10">
                   <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                 </div>
                 <div className="min-w-0">
                   <h4 className="text-[10px] font-bold text-primary line-clamp-1">{product.name}</h4>
                   <p className="text-xs font-black text-secondary">$ {product.price.toFixed(0)}</p>
-                  <div className="flex items-center gap-0.5 text-[8px] text-muted-foreground font-bold">
+                  <div className="flex items-center gap-0.5 text-[8px] text-muted-foreground font-black bg-muted/30 w-fit px-1.5 py-0.5 rounded-full mt-1">
                     <Star size={8} className="fill-secondary text-secondary" /> 4.9
                   </div>
                 </div>
@@ -122,11 +122,11 @@ export function MarketplaceMobileDiscovery({
             <Link 
               key={product.id} 
               href={`/product/${product.slug}`}
-              className="flex flex-col bg-white rounded-[28px] overflow-hidden border border-border/50 shadow-sm"
+              className="flex flex-col bg-white rounded-[2rem] overflow-hidden border border-border/30 shadow-sm active:scale-[0.98] transition-transform"
             >
-              <div className="aspect-[3/4] relative overflow-hidden bg-muted">
+              <div className="aspect-[3/4] relative overflow-hidden bg-[#f9f9f9]">
                 <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
-                <Badge className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-md text-primary border-none text-[8px] font-black px-2 py-0.5">
+                <Badge className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-primary border-none text-[8px] font-black px-2 py-0.5 shadow-sm">
                   {product.originCountry?.code} {product.originCountry?.flag}
                 </Badge>
               </div>
@@ -134,13 +134,18 @@ export function MarketplaceMobileDiscovery({
                 <h4 className="text-[11px] font-bold text-primary line-clamp-1">{product.name}</h4>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-black text-primary">$ {product.price.toFixed(2)}</span>
-                  <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                  <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary border border-secondary/20">
                     <ShoppingBag size={14} />
                   </div>
                 </div>
-                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest border-t pt-2 truncate">
-                   {product.shop?.name}
-                </p>
+                <div className="pt-2 flex items-center gap-1.5 opacity-60">
+                   <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center">
+                     <Store size={8} className="text-primary" />
+                   </div>
+                   <p className="text-[8px] font-black text-primary uppercase tracking-wider truncate">
+                      {product.shop?.name}
+                   </p>
+                </div>
               </div>
             </Link>
           ))}

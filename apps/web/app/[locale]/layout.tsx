@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { locales } from "@sharufa/shared";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { MobileBottomNav } from '@/components/MobileBottomNav';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -37,6 +38,7 @@ export default async function LocaleLayout({
           {children}
         </main>
         <Footer />
+        <MobileBottomNav />
     </NextIntlClientProvider>
   );
 }
