@@ -50,7 +50,7 @@ export function MarketplaceHeader() {
                 name="q"
                 defaultValue={query}
                 placeholder="Que recherchez-vous aujourd'hui ?"
-                className="block w-full pl-12 pr-4 py-3.5 bg-muted/40 border-none rounded-2xl text-[13px] font-bold focus:ring-4 focus:ring-secondary/10 outline-none transition-all placeholder:text-muted-foreground/60 shadow-inner"
+                className="block w-full pl-12 pr-4 py-3 md:py-2.5 bg-muted/40 md:bg-muted/30 border-none md:border md:border-border rounded-2xl md:rounded-full text-[13px] md:text-xs font-bold md:font-medium focus:ring-4 focus:ring-secondary/10 outline-none transition-all placeholder:text-muted-foreground/60"
               />
               <Button type="submit" size="sm" className="absolute right-1 top-1 bottom-1 bg-secondary text-primary font-black px-4 rounded-full hover:bg-primary hover:text-white transition-all text-[10px] uppercase tracking-widest italic">
                 Rechercher
