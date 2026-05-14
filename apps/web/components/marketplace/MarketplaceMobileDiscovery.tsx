@@ -9,7 +9,8 @@ import {
   ArrowRight, 
   ShoppingBag,
   Star,
-  ChevronRight
+  ChevronRight,
+  Store
 } from 'lucide-react'
 import { NAVIGATION_GROUPS } from '@/lib/navigation'
 import { cn } from '@/lib/utils'
