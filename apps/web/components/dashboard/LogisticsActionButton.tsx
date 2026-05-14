@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@sharufa/ui/components/button'
 import { LogisticsStatus } from '@prisma/client'
-import { updateOrderLogisticsStatus } from '@/app/dashboard/seller/orders/actions'
+import { updateOrderLogisticsStatus } from '../../app/[locale]/dashboard/seller/orders/actions'
 import { toast } from 'sonner'
 import { Loader2, Send, CheckCircle2 } from 'lucide-react'
 

@@ -23,7 +23,7 @@ import {
 import { Country, State, City } from 'country-state-city'
 import { MapPin, Plus, Trash2, Home, CheckCircle2, Loader2, Globe, Phone as PhoneIcon, Info, Search } from 'lucide-react'
 import { toast } from 'sonner'
-import { addAddress, deleteAddress, setDefaultAddress } from '@/app/dashboard/settings/actions'
+import { addAddress, deleteAddress, setDefaultAddress } from '../../app/[locale]/dashboard/settings/actions'
 import { cn } from '@/lib/utils'
 
 interface Address {
